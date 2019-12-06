@@ -1,12 +1,11 @@
-goog.module('os.alert.AlertEvent');
-goog.module.declareLegacyNamespace();
+goog.declareModuleId('es6.os.alert.AlertEvent');
 
 goog.require('goog.date.DateTime');
 goog.require('goog.events.Event');
 goog.require('goog.events.EventTarget');
 
-const AlertEventSeverity = goog.require('os.alert.AlertEventSeverity'); // eslint-disable-line no-unused-vars
-const EventType = goog.require('os.alert.EventType');
+const AlertEventType = goog.require('os.alert.EventType');
+const AlertEventSeverity = goog.requireType('os.alert.AlertEventSeverity'); // eslint-disable-line no-unused-vars
 
 /**
  * @type {number}
@@ -24,7 +23,7 @@ let id_ = 0;
  * @extends {goog.events.Event}
  * @unrestricted
  */
-class AlertEvent extends goog.events.Event {
+export default class AlertEvent extends goog.events.Event {
   /**
    * @param {string} message The alert message
    * @param {AlertEventSeverity} severity The alert severity
@@ -32,7 +31,7 @@ class AlertEvent extends goog.events.Event {
    * @param {goog.events.EventTarget=} opt_dismissDispatcher
    */
   constructor(message, severity, opt_limit, opt_dismissDispatcher) {
-    super(EventType.ALERT);
+    super(AlertEventType.ALERT);
 
     /**
      * @type {string}
@@ -64,6 +63,13 @@ class AlertEvent extends goog.events.Event {
      */
     this.severity_ = severity;
     this['id'] = id_++;
+  }
+
+  /**
+   * @return {number}
+   */
+  static get DEFAULT_LIMIT() {
+    return DEFAULT_LIMIT;
   }
 
   /**
@@ -101,6 +107,3 @@ class AlertEvent extends goog.events.Event {
     return this.dismissDispatcher_;
   }
 }
-
-exports = AlertEvent;
-exports.DEFAULT_LIMIT = DEFAULT_LIMIT;

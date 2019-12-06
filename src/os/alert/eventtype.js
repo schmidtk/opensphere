@@ -1,5 +1,4 @@
-goog.module('os.alert.EventType');
-goog.module.declareLegacyNamespace();
+goog.declareModuleId('es6.os.alert.EventType');
 
 /**
  * @enum {string}
@@ -9,4 +8,4 @@ const EventType = {
   CLEAR_ALERTS: 'clearAlerts'
 };
 
-exports = EventType;
+export default EventType;

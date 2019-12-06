@@ -4,10 +4,10 @@ goog.module.declareLegacyNamespace();
 goog.require('goog.events.EventTarget');
 goog.require('goog.log');
 goog.require('goog.structs.CircularBuffer');
-goog.require('os.alert.AlertEvent');
 goog.require('os.array');
 goog.require('os.structs.EventType');
 
+const AlertEvent = goog.require('os.alert.AlertEvent');
 const AlertEventSeverity = goog.require('os.alert.AlertEventSeverity');
 const AlertEventType = goog.require('os.alert.EventType');
 
@@ -29,7 +29,7 @@ class AlertManager extends goog.events.EventTarget {
     super();
 
     /**
-     * @type {!goog.structs.CircularBuffer.<!os.alert.AlertEvent>}
+     * @type {!goog.structs.CircularBuffer.<!AlertEvent>}
      * @private
      */
     this.savedAlerts_ = new goog.structs.CircularBuffer(maxSaved_);
@@ -87,7 +87,7 @@ class AlertManager extends goog.events.EventTarget {
     const severity = opt_severity || AlertEventSeverity.ERROR;
 
     // fire off the alert
-    const alertEvent = new os.alert.AlertEvent(alert, severity, opt_limit, opt_dismissDispatcher);
+    const alertEvent = new AlertEvent(alert, severity, opt_limit, opt_dismissDispatcher);
     this.savedAlerts_.add(alertEvent);
     this.dispatchEvent(alertEvent);
 
@@ -140,7 +140,7 @@ class AlertManager extends goog.events.EventTarget {
   /**
    * Get the alert buffer
    *
-   * @return {!goog.structs.CircularBuffer.<!os.alert.AlertEvent>} Object containing the parsed record
+   * @return {!goog.structs.CircularBuffer.<!AlertEvent>} Object containing the parsed record
    */
   getAlerts() {
     return this.savedAlerts_;
@@ -150,7 +150,7 @@ class AlertManager extends goog.events.EventTarget {
    * Process alerts that AlertManager may have already generated before this class has initialized.
    *
    * @param {!string} clientId An arbitrary string to identify the client that is processing alerts
-   * @param {!function(os.alert.AlertEvent)} handler
+   * @param {!function(AlertEvent)} handler
    * @param {*=} opt_context
    */
   processMissedAlerts(clientId, handler, opt_context) {
