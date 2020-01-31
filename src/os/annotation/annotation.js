@@ -1,23 +1,15 @@
-goog.provide('os.annotation');
-goog.provide('os.annotation.TailType');
+goog.module('os.annotation');
+goog.module.declareLegacyNamespace();
 
-goog.require('ol.geom.GeometryType');
-goog.require('ol.geom.Point');
-goog.require('os.annotation.TailStyle');
-goog.require('os.feature');
-goog.require('os.ui');
-goog.require('os.ui.FeatureEditCtrl');
-goog.require('os.ui.color.colorPickerDirective');
+const GeometryType = goog.require('ol.geom.GeometryType');
+const {getUid} = goog.require('ol');
+const Point = goog.require('ol.geom.Point');
+const TailStyle = goog.require('os.annotation.TailStyle');
+const {measureText} = goog.require('os.ui');
+const FeatureEditCtrl = goog.require('os.ui.FeatureEditCtrl');
 
-
-/**
- * The SVG tail CSS position.
- * @enum {string}
- */
-os.annotation.TailType = {
-  FIXED: 'fixed',
-  ABSOLUTE: 'absolute'
-};
+const Feature = goog.requireType('ol.Feature');
+const Overlay = goog.requireType('ol.Overlay');
 
 
 /**
@@ -25,13 +17,13 @@ os.annotation.TailType = {
  * @type {osx.annotation.Options}
  * @const
  */
-os.annotation.DEFAULT_OPTIONS = {
+exports.DEFAULT_OPTIONS = {
   editable: true,
   show: true,
   showBackground: true,
   showName: true,
   showDescription: true,
-  showTail: os.annotation.TailStyle.DEFAULT,
+  showTail: TailStyle.DEFAULT,
   size: [200, 100],
   offset: [0, -75],
   headerBG: undefined,
@@ -44,7 +36,7 @@ os.annotation.DEFAULT_OPTIONS = {
  * @type {number}
  * @const
  */
-os.annotation.MAX_DEFAULT_HEIGHT = 350;
+exports.MAX_DEFAULT_HEIGHT = 350;
 
 
 /**
@@ -55,7 +47,7 @@ os.annotation.MAX_DEFAULT_HEIGHT = 350;
  * @type {number}
  * @const
  */
-os.annotation.MAX_DEFAULT_WIDTH = 350;
+exports.MAX_DEFAULT_WIDTH = 350;
 
 
 /**
@@ -64,7 +56,7 @@ os.annotation.MAX_DEFAULT_WIDTH = 350;
  * @type {number}
  * @const
  */
-os.annotation.EDIT_HEIGHT = 270;
+exports.EDIT_HEIGHT = 270;
 
 
 /**
@@ -73,14 +65,14 @@ os.annotation.EDIT_HEIGHT = 270;
  * @type {number}
  * @const
  */
-os.annotation.EDIT_WIDTH = 570;
+exports.EDIT_WIDTH = 570;
 
 
 /**
  * Annotation event types.
  * @enum {string}
  */
-os.annotation.EventType = {
+exports.EventType = {
   CHANGE: 'annotation:change',
   EDIT: 'annotation:edit',
   HIDE: 'annotation:hide',
@@ -94,7 +86,7 @@ os.annotation.EventType = {
  * @type {string}
  * @const
  */
-os.annotation.OPTIONS_FIELD = '_annotationOptions';
+exports.OPTIONS_FIELD = '_annotationOptions';
 
 
 /**
@@ -103,14 +95,14 @@ os.annotation.OPTIONS_FIELD = '_annotationOptions';
  * @param {osx.annotation.Options} options The options.
  * @param {string} text The annotation text.
  */
-os.annotation.scaleToText = function(options, text) {
+exports.scaleToText = function(options, text) {
   // compute the annotation size from the text. the height/width must include the text size, plus the header/padding.
-  var size = os.ui.measureText(text, 'u-annotation__measure');
+  var size = measureText(text, 'u-annotation__measure');
 
   var annotationHeight = size.height + 10 + (options.showName ? 25 : 0);
-  annotationHeight = Math.min(annotationHeight, os.annotation.MAX_DEFAULT_HEIGHT);
+  annotationHeight = Math.min(annotationHeight, exports.MAX_DEFAULT_HEIGHT);
 
-  var annotationWidth = Math.min(size.width + 10, os.annotation.MAX_DEFAULT_WIDTH);
+  var annotationWidth = Math.min(size.width + 10, exports.MAX_DEFAULT_WIDTH);
   options.size = [annotationWidth, annotationHeight];
 
   // display the annotation 25px above the target
@@ -121,12 +113,12 @@ os.annotation.scaleToText = function(options, text) {
 /**
  * Get the name text for an annotation balloon.
  *
- * @param {ol.Feature} feature The feature.
+ * @param {Feature} feature The feature.
  * @return {string} The text.
  */
-os.annotation.getNameText = function(feature) {
+exports.getNameText = function(feature) {
   if (feature) {
-    return /** @type {string|undefined} */ (feature.get(os.ui.FeatureEditCtrl.Field.NAME)) || '';
+    return /** @type {string|undefined} */ (feature.get(FeatureEditCtrl.Field.NAME)) || '';
   }
 
   return '';
@@ -136,13 +128,13 @@ os.annotation.getNameText = function(feature) {
 /**
  * Get the description text for an annotation balloon.
  *
- * @param {ol.Feature} feature The feature.
+ * @param {Feature} feature The feature.
  * @return {string} The text.
  */
-os.annotation.getDescriptionText = function(feature) {
+exports.getDescriptionText = function(feature) {
   if (feature) {
-    return /** @type {string|undefined} */ (feature.get(os.ui.FeatureEditCtrl.Field.MD_DESCRIPTION)) ||
-    /** @type {string|undefined} */ (feature.get(os.ui.FeatureEditCtrl.Field.DESCRIPTION)) || '';
+    return /** @type {string|undefined} */ (feature.get(FeatureEditCtrl.Field.MD_DESCRIPTION))
+        || /** @type {string|undefined} */ (feature.get(FeatureEditCtrl.Field.DESCRIPTION)) || '';
   }
 
   return '';
@@ -152,14 +144,14 @@ os.annotation.getDescriptionText = function(feature) {
 /**
  * If a feature has a map overlay present.
  *
- * @param {ol.Feature} feature The feature.
+ * @param {Feature} feature The feature.
  * @return {boolean}
  */
-os.annotation.hasOverlay = function(feature) {
+exports.hasOverlay = function(feature) {
   if (feature) {
     var map = os.MapContainer.getInstance().getMap();
     if (map) {
-      return !!map.getOverlayById(ol.getUid(feature));
+      return !!map.getOverlayById(getUid(feature));
     }
   }
 
@@ -170,23 +162,23 @@ os.annotation.hasOverlay = function(feature) {
 /**
  * Set the target map position for an overlay.
  *
- * @param {!ol.Overlay} overlay The overlay.
- * @param {ol.Feature} feature The feature. Use null to hide the overlay.
+ * @param {!Overlay} overlay The overlay.
+ * @param {Feature} feature The feature. Use null to hide the overlay.
  */
-os.annotation.setPosition = function(overlay, feature) {
+exports.setPosition = function(overlay, feature) {
   var position;
 
   if (feature) {
     var geometry = feature.getGeometry();
-    if (geometry && geometry.getType() === ol.geom.GeometryType.POINT) {
+    if (geometry && geometry.getType() === GeometryType.POINT) {
       // nothing fancy for points, just use the coordinate
-      position = /** @type {ol.geom.Point} */ (geometry).getFirstCoordinate();
+      position = /** @type {Point} */ (geometry).getFirstCoordinate();
     } else {
       var map = overlay.getMap();
       var element = overlay.getElement();
 
       if (map && element) {
-        var mapRect = os.annotation.getMapRect(overlay);
+        var mapRect = exports.getMapRect(overlay);
         var cardRect = element.getBoundingClientRect();
         cardRect.x -= mapRect.x;
         cardRect.y -= mapRect.y;
@@ -201,7 +193,7 @@ os.annotation.setPosition = function(overlay, feature) {
           return;
         }
 
-        var cardGeometry = new ol.geom.Point(coordinate);
+        var cardGeometry = new Point(coordinate);
 
         if (cardGeometry && geometry) {
           var coords = os.geo.jsts.nearestPoints(cardGeometry, geometry);
@@ -218,10 +210,10 @@ os.annotation.setPosition = function(overlay, feature) {
 /**
  * Get the OpenLayers map bounding rectangle.
  *
- * @param {ol.Overlay} overlay The overlay to get the map rectangle from.
+ * @param {Overlay} overlay The overlay to get the map rectangle from.
  * @return {ClientRect|undefined} The map bounding rectangle, or undefined if the map/overlay are not defined.
  */
-os.annotation.getMapRect = function(overlay) {
+exports.getMapRect = function(overlay) {
   if (overlay) {
     var map = overlay.getMap();
     if (map) {

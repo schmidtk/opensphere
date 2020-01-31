@@ -1,6 +1,7 @@
-goog.provide('os.annotation.annotationOptionsDirective');
+goog.module('os.annotation.annotationOptionsDirective');
+goog.module.declareLegacyNamespace();
 
-goog.require('os.ui.Module');
+const Module = goog.require('os.ui.Module');
 
 
 /**
@@ -8,7 +9,7 @@ goog.require('os.ui.Module');
  *
  * @return {angular.Directive}
  */
-os.annotation.annotationOptionsDirective = function() {
+const directive = () => {
   return {
     restrict: 'E',
     replace: true,
@@ -20,4 +21,5 @@ os.annotation.annotationOptionsDirective = function() {
 /**
  * Add the directive to the module
  */
-os.ui.Module.directive('annotationoptions', [os.annotation.annotationOptionsDirective]);
+Module.directive('annotationoptions', [directive]);
+exports = directive;
