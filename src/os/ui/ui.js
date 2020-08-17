@@ -153,6 +153,10 @@ os.ui.escapeHtml = function(html) {
  */
 os.ui.Module = angular.module('os.ui', ['ui.directives', 'ngAnimate', 'ngSanitize']);
 
+os.ui.Module.config(['$compileProvider', function($compileProvider) {
+  $compileProvider.aHrefSanitizationWhitelist(/^\s*((https?|s?ftp|mailto|tel|file):|data:image\/)/);
+}]);
+
 
 /**
  * Measures the given string of text. Note that this function adds a node to the DOM completely

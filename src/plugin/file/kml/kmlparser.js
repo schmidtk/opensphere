@@ -1518,15 +1518,15 @@ plugin.file.kml.KMLParser.prototype.applyStyles_ = function(el, feature) {
     // support KMZ assets in the description
     for (var key in this.assetMap_) {
       // replace naive URLs
-      var pattern = 'src=["\']' + key.replace(/(.)/g, '[$1]') + '["\']';
+      var pattern = '(href|src)=["\']' + key.replace(/(.)/g, '[$1]') + '["\']';
       var regex = new RegExp(pattern);
-      description = description.replace(regex, 'src="' + this.assetMap_[key] + '"');
+      description = description.replace(regex, '$1="' + this.assetMap_[key] + '"');
 
       // replace properly encoded URLs
       var encodedKey = new goog.Uri(key).toString();
-      pattern = 'src=["\']' + encodedKey.replace(/(.)/g, '[$1]') + '["\']';
+      pattern = '(href|src)=["\']' + encodedKey.replace(/(.)/g, '[$1]') + '["\']';
       regex = new RegExp(pattern);
-      description = description.replace(regex, 'src="' + this.assetMap_[key] + '"');
+      description = description.replace(regex, '$1="' + this.assetMap_[key] + '"');
     }
 
     feature.set('description', description);
