@@ -139,33 +139,8 @@ plugin.cesium.CesiumRenderer.prototype.initialize = function() {
           sm.registerSynchronizer(os.layer.SynchronizerType.IMAGE_STATIC, plugin.cesium.sync.ImageStaticSynchronizer);
           sm.registerSynchronizer(plugin.heatmap.SynchronizerType.HEATMAP, plugin.cesium.sync.HeatmapSynchronizer);
 
-          // add 3D layer group
-          var group = new os.layer.Group();
-          group.setPriority(3);
-          group.setOSType(plugin.cesium.CESIUM_ONLY_LAYER);
-          group.setCheckFunc(function(layer) {
-            if (os.implements(layer, os.layer.ILayer.ID)) {
-              return /** @type {os.layer.ILayer} */ (layer).getOSType() === plugin.cesium.CESIUM_ONLY_LAYER;
-            }
-            return false;
-          });
-
-          os.map.mapContainer.addGroup(group);
-
           // set up menus
           plugin.cesium.menu.importSetup();
-
-          // register 3D tiles layers
-          var lcm = os.layer.config.LayerConfigManager.getInstance();
-          lcm.registerLayerConfig(plugin.cesium.tiles.ID, plugin.cesium.tiles.LayerConfig);
-
-          var dm = os.dataManager;
-          dm.registerProviderType(new os.data.ProviderEntry(
-              plugin.cesium.tiles.ID,
-              plugin.cesium.tiles.Provider,
-              plugin.cesium.tiles.TYPE,
-              plugin.cesium.tiles.TYPE));
-          dm.registerDescriptorType(plugin.cesium.tiles.ID, plugin.cesium.tiles.Descriptor);
 
           var im = os.ui.im.ImportManager.getInstance();
           im.registerImportDetails(plugin.cesium.tiles.TYPE, true);
